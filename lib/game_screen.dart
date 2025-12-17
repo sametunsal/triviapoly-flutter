@@ -103,7 +103,7 @@ class GameScreen extends StatelessWidget {
                 !controller.isQuestionPanelVisible &&
                 controller.currentPlayerIndex < controller.players.length)
               _buildTurnIndicator(context),
-            // Scoreboard
+            // Scoreboard (UPDATED with Sudden Death support)
             Positioned(
               top: 16,
               right: 16,
@@ -116,6 +116,7 @@ class GameScreen extends StatelessWidget {
                 maxTurns: controller.maxTurns,
                 winner: controller.winner,
                 isGameEnded: controller.isGameEnded,
+                isSuddenDeath: controller.isSuddenDeathActive, // NEW PARAMETER
               ),
             ),
             // Game mode / progress indicator
@@ -146,7 +147,7 @@ class GameScreen extends StatelessWidget {
             if (controller.diceValue > 0 || controller.isDiceRolling)
               _buildDiceValueDisplay(
                   context, screenWidth, diceButtonTop, diceButtonHeight),
-            // Manual end game button - disabled while panels are visible
+            // Manual end game button
             if (controller.gameState != GameState.gameOver &&
                 !controller.isDeterminingStartingOrder)
               Positioned(
@@ -172,6 +173,9 @@ class GameScreen extends StatelessWidget {
       ),
     );
   }
+
+  // ... (Diğer widget metotları aynı kalacak, sadece WinnerPanel değişti)
+  // Kolaylık olsun diye değişmeyenleri de ekledim ama WinnerPanel önemli.
 
   Widget _buildStartingOrderPanel() {
     return Positioned(
@@ -329,6 +333,7 @@ class GameScreen extends StatelessWidget {
     );
   }
 
+  // GÜNCELLENMİŞ KAZANAN EKRANI (Bonus Soru sayısı eklendi)
   Widget _buildWinnerPanel() {
     return Positioned.fill(
       child: SizedBox.expand(
@@ -369,9 +374,29 @@ class GameScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      '⭐ ${controller.winner!.stars} yıldız',
+                      '⭐ ${controller.winner!.stars} puan',
                       style:
-                          const TextStyle(fontSize: 20, color: Colors.black87),
+                          const TextStyle(fontSize: 24, color: Colors.black87, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.blue.shade200),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.star, size: 16, color: Colors.blue),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Doğru Bonus Soru: ${controller.winner!.bonusQuestionsAnswered}',
+                            style: TextStyle(fontSize: 16, color: Colors.blue.shade900),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 24),
                     SizedBox(
@@ -387,7 +412,7 @@ class GameScreen extends StatelessWidget {
                           elevation: 2,
                         ),
                         child: const Text(
-                          'Restart Game',
+                          'TEKRAR OYNA',
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold),
                         ),
