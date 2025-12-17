@@ -9,6 +9,7 @@ class Scoreboard extends StatelessWidget {
   final int? maxTurns;
   final Player? winner; // Winner of the game
   final bool isGameEnded; // Whether game has ended
+  final bool isSuddenDeath; // NEW: Ani ölüm durumu
 
   const Scoreboard({
     super.key,
@@ -18,6 +19,7 @@ class Scoreboard extends StatelessWidget {
     this.maxTurns,
     this.winner,
     this.isGameEnded = false,
+    this.isSuddenDeath = false, // Default false
   });
 
   List<Player> _getSortedPlayers() {
@@ -59,14 +61,43 @@ class Scoreboard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(12),
-        border:
-            Border.all(color: Colors.white.withValues(alpha: 0.2), width: 1),
+        border: Border.all(
+          color: isSuddenDeath ? Colors.redAccent : Colors.white.withValues(alpha: 0.2), 
+          width: isSuddenDeath ? 2 : 1
+        ),
+        boxShadow: isSuddenDeath ? [
+          BoxShadow(color: Colors.red.withValues(alpha: 0.3), blurRadius: 10, spreadRadius: 2)
+        ] : [],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (gameMode == GameMode.turnBased)
+          // ANİ ÖLÜM BAŞLIĞI
+          if (isSuddenDeath)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.redAccent.withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text(
+                  '💀 ANİ ÖLÜM MODU 💀',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+              ),
+            ),
+
+          if (gameMode == GameMode.turnBased && !isSuddenDeath)
             Padding(
               padding: const EdgeInsets.only(bottom: 6),
               child: Container(
@@ -159,7 +190,7 @@ class Scoreboard extends StatelessWidget {
                                   color: Colors.red.shade400,
                                 ),
                               ),
-                            if (isLeading && !isBankrupt && !isWinner)
+                            if (isLeading && !isBankrupt && !isWinner && !isSuddenDeath)
                               Padding(
                                 padding: const EdgeInsets.only(left: 4),
                                 child: Icon(
